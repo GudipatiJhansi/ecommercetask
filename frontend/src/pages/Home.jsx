@@ -9,6 +9,7 @@ const CATEGORIES = ['All', 'Electronics', 'Wearables', 'Accessories', 'Home Deco
 const Home = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All');
   const [sort, setSort] = useState('');
@@ -33,6 +34,7 @@ const Home = () => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
+        setError(null);
         const params = {
           page,
           limit: 8,
@@ -46,8 +48,9 @@ const Home = () => {
         setProducts(data.products);
         setPages(data.pages);
         setTotal(data.total);
-      } catch (error) {
-        console.error('Error loading products:', error);
+      } catch (err) {
+        console.error('Error loading products:', err);
+        setError(err.response?.data?.message || err.message || 'Connection to backend failed');
       } finally {
         setLoading(false);
       }
@@ -95,6 +98,16 @@ const Home = () => {
       {/* Primary Storefront Interface */}
       <main id="store-front" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
         
+        {error && (
+          <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/50 text-red-700 dark:text-red-400 p-4 rounded-xl mb-6 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">⚠️</span>
+              <p className="text-sm font-semibold">API Error: {error}. Check if your backend server is running and database is connected.</p>
+            </div>
+            <button onClick={() => setError(null)} className="text-xs hover:underline font-bold uppercase">Dismiss</button>
+          </div>
+        )}
+
         {/* Filtering & Search Controllers */}
         <section className="bg-white dark:bg-darkbg-surface p-4 sm:p-6 rounded-2xl border border-gray-100 dark:border-darkbg-border shadow-sm mb-8">
           <div className="flex flex-col gap-4">
