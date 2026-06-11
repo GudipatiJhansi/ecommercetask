@@ -21,6 +21,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Rewrite Vercel stripped '/api' prefix to match API routes
+app.use((req, res, next) => {
+  if (!req.url.startsWith('/api') && req.url !== '/') {
+    req.url = '/api' + req.url;
+  }
+  next();
+});
+
 // API Route Mountpoints
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
